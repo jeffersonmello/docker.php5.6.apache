@@ -1,0 +1,33 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main   # Executa o workflow ao fazer push na branch "main"
+  pull_request:
+    branches:
+      - main   # Executa o workflow ao criar uma PR na branch "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout do código do repositório
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Faz login no Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      # Faz o build da imagem Docker
+      - name: Build the Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/php56apache:latest .
+
+      # Envia a imagem para o Docker Hub
+      - name: Push the Docker image
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/php56apache:latest
